@@ -1,1 +1,1 @@
-Here I will cllect my notes related to my stage work.
+Here I will collect my notes related to my stage work.
