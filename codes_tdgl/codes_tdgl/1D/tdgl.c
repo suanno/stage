@@ -1,16 +1,56 @@
 // Solve the TDGL equation
 // Forward integration using implicit Euler scheme
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <fftw3.h>
 
 #define pi 4*atan(1.0)
 
-int main(){
+int main(int argc, char  *argv [ ]){
 
-const int N=10000;
-const double dt=0.1;
-const double dx=0.1;
+FILE *fileinit;
+int N=1000;
+double dx=0.1;
+
+double dt=0.1;
+double tmin=1;	//It is the tmax of "tdglfd"
+double Deltat = 10;
+double tmax = tmin + Deltat;
+
+/* C(t)=Ampl*sign(sin(2pi/Thalf*t) 
+   so it switchd from +Ampl to -Ampl every Thalf time    
+*/
+double Ampl = 1;
+double Thalf = tmax;  // with this choice C will be constantly +1
+
+//fileinit = fopen("tdgl_init.dat", "r");
+fileinit = fopen("tdgl_result.dat", "r");
+/*First line is for parameters and seed*/
+int seed;
+fscanf(fileinit, "%d %lf %lf %lf %d %lf %lf", &N, &tmin, &dx, &dt, &seed, &Ampl, &Thalf);
+fclose(fileinit);
+
+/* Get inputs from the terminal */
+char *ptr;
+//printf("argv1 = %lf", atof(argv[1]));
+if (argc > 1)
+	tmax=strtod(argv[1], &ptr);
+if (argc > 2){
+  	Ampl = strtod(argv[2], &ptr);
+}
+if (argc > 3){
+  	Thalf = strtod(argv[3], &ptr);
+}
+tmax = tmin + Deltat;
+/*
+if (argc > 2){
+  	Ampl = strtod(argv[2], &ptr);
+}
+if (argc > 3){
+  	Thalf = strtod(argv[3], &ptr);
+}
+*/
 
 double x[10000];
 double u[10000];
@@ -41,16 +81,13 @@ double integ_coef[10000];
 double q2meannum=0.0;
 double q2meandenum=0.0;
 
-FILE *fileinit;
 FILE *stateeqn_result;
 FILE *fileCout;
 //FILE *fileCin;
 FILE *fileq2mean;
 
 double ttime=0;
-double tmin=1;
-double tmax=10;
-int nloop=(tmax-tmin)/dt;
+int nloop=(Deltat)/dt;
 int loop;
 double q2mean[nloop];
 double C[nloop];
@@ -66,8 +103,8 @@ for (loop=0;loop<nloop;loop++){
 ttime = tmin + (loop+1)*dt;
 //C(t_{k+1})
 //C[loop]=sin(2*pi*ttime/1);
-if (sin(2*pi*ttime/1)>=0) C[loop]=1;
-else C[loop]=-1;
+if (sin(pi*ttime/Thalf)>=0) C[loop]=Ampl;
+else C[loop]=-Ampl;
 }
 
 ttime=0;
@@ -94,7 +131,11 @@ for (i=0; i<N; i++){
 qfr[i]=ffr[i]*2*pi/N;
 }
 
-fileinit = fopen("tdgl_init.dat", "r");
+//fileinit = fopen("tdgl_init.dat", "r");
+fileinit = fopen("tdgl_result.dat", "r");
+/*First line is for parameters and seed*/
+fscanf(fileinit, "%d %lf %lf %lf %d", &N, &tmin, &dx, &dt, &seed);
+/*Now read the initial (smooth) state*/
 for (i=0; i<N; i++){
 fscanf(fileinit, "%lf %lf \n", &decainx, &decainu);
 x[i]=decainx;
@@ -175,7 +216,10 @@ u[i]=udt[i];
 
 }
 
+/*Save the final state*/
 stateeqn_result = fopen("tdgl_result.dat", "w");
+/*Save parameters N, tmax, dx, dt, seed, Ampl, Thalf*/
+fprintf(stateeqn_result, "%d %.2lf %.10lf %.10lf %d %lf %lf\n", N, tmax, dx, dt, seed, Ampl, Thalf);
 for (i=0; i<N; i++){
 decaoutx=x[i];
 decaoutu=u[i];

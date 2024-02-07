@@ -21,14 +21,17 @@ int main(){
 
 int i;
 
-int N=10000;
+int N=1000;
 double deca;
 double hmoy=0.0;
+int seed;
 
 FILE *fileinit;
 
-srand(time(NULL));
-fileinit = fopen("fileL1000init.dat", "w");
+seed = time(NULL);
+srand(seed);
+fileinit = fopen("fileL10000init.dat", "w");
+fprintf(fileinit, "%d\n", seed);
 #pragma omp parallel for
 for (i=0; i<N; i++){
 deca=randU(-0.1, 0.1)+hmoy;

@@ -1,0 +1,4 @@
+C(t) switching +-1 w/ period T/2=1/2
+N = 10000
+dx = 0.1
+dt = 0.001
