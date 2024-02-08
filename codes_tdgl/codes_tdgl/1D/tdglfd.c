@@ -80,9 +80,17 @@ double C[nloop];
 
 
 for (loop=0;loop<nloop;loop++){
-    ttime = tmin + (loop+1)*dt;
-    if (sin(pi*ttime/Thalf)>=0) C[loop]=Ampl;
-    else C[loop]=-Ampl;
+ttime = tmin + (loop+1)*dt;
+//C(t_{k+1})
+//C[loop]=sin(2*pi*ttime/1);
+if(Thalf > 0){
+	if (sin(pi*ttime/Thalf)>=0) 
+		C[loop]=Ampl;
+	else 
+		C[loop]=-Ampl;
+	}
+	else
+		C[loop] = Ampl;
 }
 /*
 for (loop = 0; loop < nloop; loop++){
@@ -142,7 +150,7 @@ for(loop=0;loop<nloop;loop++) {
 }
 
 /*Save values of C(t) in different times*/
-fileCout = fopen("fileCout.dat", "w");
+fileCout = fopen("fileCout.dat", "a");
 for (loop=0; loop<nloop; loop++){
 ttime = tmin + (loop+1)*dt;
 decaoutC = C[loop];

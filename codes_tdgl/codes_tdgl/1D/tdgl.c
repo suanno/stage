@@ -24,23 +24,25 @@ double tmax = tmin + Deltat;
 double Ampl = 1;
 double Thalf = tmax;  // with this choice C will be constantly +1
 
+/* READ PARAMETERS */
 //fileinit = fopen("tdgl_init.dat", "r");
 fileinit = fopen("tdgl_result.dat", "r");
 /*First line is for parameters and seed*/
 int seed;
-fscanf(fileinit, "%d %lf %lf %lf %d %lf %lf", &N, &tmin, &dx, &dt, &seed, &Ampl, &Thalf);
+fscanf(fileinit, "%d %lf %lf %lf %d %lf %lf\n", &N, &tmin, &dx, &dt, &seed, &Ampl, &Thalf);
 fclose(fileinit);
 
 /* Get inputs from the terminal */
 char *ptr;
 //printf("argv1 = %lf", atof(argv[1]));
 if (argc > 1)
-	tmax=strtod(argv[1], &ptr);
+	Deltat = strtod(argv[1], &ptr);
 if (argc > 2){
   	Ampl = strtod(argv[2], &ptr);
 }
 if (argc > 3){
   	Thalf = strtod(argv[3], &ptr);
+	//printf("\n%lf\n", Thalf);
 }
 tmax = tmin + Deltat;
 /*
@@ -99,12 +101,20 @@ double C[nloop];
 //}
 //fclose(fileCin);
 
+/*Define value of C(t) in time.
+	It switches from +A to -A each T/2 time */
 for (loop=0;loop<nloop;loop++){
 ttime = tmin + (loop+1)*dt;
 //C(t_{k+1})
 //C[loop]=sin(2*pi*ttime/1);
-if (sin(pi*ttime/Thalf)>=0) C[loop]=Ampl;
-else C[loop]=-Ampl;
+if(Thalf > 0){
+	if (sin(pi*ttime/Thalf)>=0) 
+		C[loop]=Ampl;
+	else 
+		C[loop]=-Ampl;
+	}
+	else
+		C[loop] = Ampl;
 }
 
 ttime=0;
@@ -121,6 +131,7 @@ out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
 pf = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 pb = fftw_plan_dft_1d(N, in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
 
+/*Define q-space lattice*/
 for (i=1; i<(N/2); i++){
 ffr[i]=i;
 ffr[N-i]=-i;
@@ -131,13 +142,16 @@ for (i=0; i<N; i++){
 qfr[i]=ffr[i]*2*pi/N;
 }
 
+/*LOAD INITIAL STATE*/
 //fileinit = fopen("tdgl_init.dat", "r");
 fileinit = fopen("tdgl_result.dat", "r");
 /*First line is for parameters and seed*/
-fscanf(fileinit, "%d %lf %lf %lf %d", &N, &tmin, &dx, &dt, &seed);
+fscanf(fileinit, "%d %lf %lf %lf %d %lf %lf\n", &N, &tmin, &dx, &dt, &seed, &Ampl, &Thalf);
 /*Now read the initial (smooth) state*/
 for (i=0; i<N; i++){
 fscanf(fileinit, "%lf %lf \n", &decainx, &decainu);
+if(i==0)
+	printf("%lf\n", decainx);
 x[i]=decainx;
 u[i]=decainu;
 }
@@ -145,7 +159,7 @@ fclose(fileinit);
 
 //------------------------------------
 
-// coefficients for spectral derivatives
+// coefficients for spectral derivatives (-q^2) array
 for (i=0; i<N; i++){
 d2coef[i]=-(qfr[i]/dx)*(qfr[i]/dx);
 }
@@ -154,10 +168,12 @@ for (loop=0; loop < nloop; loop++){
 
 ttime = tmin + (loop+1)*dt;
 
+/*Denominator of implicit euler [As equation is non-linear, the numerator will be unusual, but the denominator no]*/
 for (i=0; i<N; i++){
-integ_coef[i]=1-dt*C[loop]-dt*d2coef[i];
+integ_coef[i]=1-dt*C[loop]-dt*d2coef[i]; //Note that d2coeff = -q^2 (already contains a minus sign)
 }
 
+/*Compute FFT of u(x)->u(q)*/
 // transform h
 for(i=0; i<N; i++) {
 in[i][0]=u[i];
@@ -169,6 +185,7 @@ ufr[i]=out[i][0];
 ufi[i]=out[i][1];
 }
 
+/*???*/
 q2meannum=0.0;
 q2meandenum=0.0;
 for(i=0; i<N; i++) {
@@ -179,6 +196,7 @@ q2mean[loop] = q2meannum/q2meandenum;
 
 // ********** begin of main algorithm **********
 
+/*Compute FFT of u(x)^3 */
 for (i=0; i<N; i++){
 NL[i]=u[i]*u[i]*u[i];
 }
@@ -194,13 +212,15 @@ NLfi[i]=out[i][1];
 }
 
 for (i=0; i<N; i++){
-// implicit Euler scheme
-udtfr[i]=(ufr[i]-dt*NLfr[i])/integ_coef[i];
+/*IMPLICIT EULER*/
+//implicit Euler scheme
+udtfr[i]=(ufr[i]-dt*NLfr[i])/integ_coef[i];	//The numerator has unusual shape because eq. in non-linear
 udtfi[i]=(ufi[i]-dt*NLfi[i])/integ_coef[i];
 }
 
 // ********** end of main algorithm **********
 
+/*INVERSE FFT*/
 for(i=0; i<N; i++) {
 in[i][0]=udtfr[i];
 in[i][1]=udtfi[i];
@@ -235,7 +255,7 @@ fprintf(fileq2mean, "%.2f %.20f\n", ttime, decaoutq2mean);
 }
 fclose(fileq2mean);
 
-fileCout = fopen("fileCout.dat", "w");
+fileCout = fopen("fileCout.dat", "a");
 for (loop=0; loop<nloop; loop++){
 ttime = tmin + (loop+1)*dt;
 decaoutC = C[loop];

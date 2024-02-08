@@ -40,6 +40,14 @@ fprintf(fileinit, "%.20f\n", deca);
 
 fclose(fileinit);
 
+/*Recreate fileCout of values of C(t) [Progressive
+executions of the dynamics will APPEND info]*/
+FILE *fileCout;
+fileCout = fopen("fileCout.dat", "w");
+//fprintf(fileCout, "");
+fclose(fileCout);
+
+
 return 0;
 
 }
