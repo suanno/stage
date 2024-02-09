@@ -72,6 +72,7 @@ double decainu=0;
 double decaoutx=0;
 double decaoutu=0;
 double decaoutC=0;
+double decaoutAve=0;
 double decaoutq2mean=0;
 double decainC=0;
 double decatime=0;
@@ -84,7 +85,8 @@ double q2meannum=0.0;
 double q2meandenum=0.0;
 
 FILE *stateeqn_result;
-FILE *fileCout;
+FILE *fileCout;				/*C(t) values*/
+FILE *fileAveout;			/*Space average of u(t) values*/
 //FILE *fileCin;
 FILE *fileq2mean;
 
@@ -93,6 +95,7 @@ int nloop=(Deltat)/dt;
 int loop;
 double q2mean[nloop];
 double C[nloop];
+double uAve[nloop];
 
 //fileCin = fopen("fileC.dat", "r");
 //for (loop=0; loop<nloop; loop++){
@@ -105,13 +108,15 @@ double C[nloop];
 	It switches from +A to -A each T/2 time */
 for (loop=0;loop<nloop;loop++){
 ttime = tmin + (loop+1)*dt;
-//C(t_{k+1})
-//C[loop]=sin(2*pi*ttime/1);
 if(Thalf > 0){
+	C[loop]=Ampl*sin(pi*ttime/Thalf);
+	//C(t_{k+1})
+	/*
 	if (sin(pi*ttime/Thalf)>=0) 
 		C[loop]=Ampl;
 	else 
 		C[loop]=-Ampl;
+	*/
 	}
 	else
 		C[loop] = Ampl;
@@ -168,6 +173,13 @@ for (loop=0; loop < nloop; loop++){
 
 ttime = tmin + (loop+1)*dt;
 
+/*Compute space average*/
+uAve[loop] = 0;
+for (i = 0; i<N; i++){
+	uAve[loop] = uAve[loop] + u[i];
+}
+uAve[loop] = uAve[loop]/N;
+//printf("Ave(%lf) = %lf", ttime, uAve[loop]);
 /*Denominator of implicit euler [As equation is non-linear, the numerator will be unusual, but the denominator no]*/
 for (i=0; i<N; i++){
 integ_coef[i]=1-dt*C[loop]-dt*d2coef[i]; //Note that d2coeff = -q^2 (already contains a minus sign)
@@ -234,6 +246,7 @@ for(i=0; i<N; i++) {
 u[i]=udt[i];
 }
 
+
 }
 
 /*Save the final state*/
@@ -262,6 +275,14 @@ decaoutC = C[loop];
 fprintf(fileCout, "%.5f %.20f\n", ttime, decaoutC);
 }
 fclose(fileCout);
+
+fileAveout = fopen("fileAveout.dat", "a");
+for (loop=0; loop<nloop; loop++){
+ttime = tmin + (loop+1)*dt;
+decaoutAve = uAve[loop];
+fprintf(fileAveout, "%.5f %.20f\n", ttime, decaoutAve);
+}
+fclose(fileAveout);
 
 fftw_destroy_plan(pf);
 fftw_destroy_plan(pb);

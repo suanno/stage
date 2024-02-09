@@ -23,7 +23,7 @@ double tmax=1;  // Suggest "1" because in the fft algorithm tmin = 1 is hardcode
    so it switchd from +Ampl to -Ampl every Thalf time    
 */
 double Ampl = 1;
-double Thalf = tmax;  // with this choice C will be constantly +1
+double Thalf = -1;  // with this choice C will be constantly +Ampl
 
 
 /* Get inputs from the terminal */
@@ -82,12 +82,14 @@ double C[nloop];
 for (loop=0;loop<nloop;loop++){
 ttime = tmin + (loop+1)*dt;
 //C(t_{k+1})
-//C[loop]=sin(2*pi*ttime/1);
 if(Thalf > 0){
+  C[loop]=Ampl*sin(pi*ttime/Thalf);
+  /*
 	if (sin(pi*ttime/Thalf)>=0) 
 		C[loop]=Ampl;
 	else 
 		C[loop]=-Ampl;
+  */
 	}
 	else
 		C[loop] = Ampl;
@@ -104,8 +106,9 @@ FILE *filetdglinit;
 FILE *fileCout;
 int seed;
 
-filerandominit = fopen("fileL10000init.dat", "r");
-fscanf(filerandominit, "%d\n", &seed);
+filerandominit = fopen("fileinit.dat", "r");
+/*First line is the seed*/
+fscanf(filerandominit, "%d %d\n", &seed, &N);
 for (i=0; i<N; i++){
 fscanf(filerandominit, "%lf\n", &z);
 u[i]=z;
@@ -118,6 +121,7 @@ fclose(filerandominit);
 
 /*Time loop*/
 
+/*printf("nloop = %d", nloop);*/
 for(loop=0;loop<nloop;loop++) {
 
     ttime = (loop+1)*dt+tmin;
@@ -166,7 +170,7 @@ tmax = tmax + tmin; // So we save the TOTAL time of the dynamics
 fprintf(filetdglinit, "%d %.2lf %.10lf %.10lf %d %lf %lf\n", N, tmax, dx, dt, seed, Ampl, Thalf);
 for(i=0;i<N;i++) {
 decax=i*dx;
-decau=udt[i];
+decau=u[i];
 fprintf(filetdglinit, "%.2f %.20f\n", decax, decau);
 }
 fclose(filetdglinit);
