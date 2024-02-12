@@ -9,50 +9,48 @@
 
 int main(int argc, char  *argv [ ]){
 
-FILE *fileinit;
+/*Parameters: They are read from previous simulation .dat file*/
 int N=1000;
 double dx=0.1;
 
-double dt=0.1;
-double tmin=1;	//It is the tmax of "tdglfd"
+double dt=0.01;
+double tmin=1;	//tmin is the tmax of previous evolution
 double Deltat = 10;
 double tmax = tmin + Deltat;
 
-/* C(t)=Ampl*sign(sin(2pi/Thalf*t) 
-   so it switchd from +Ampl to -Ampl every Thalf time    
-*/
+/*C(t) = Ampl*sin(pi*t/(T/2))*/
 double Ampl = 1;
-double Thalf = tmax;  // with this choice C will be constantly +1
+double Thalf = -1;  // with this choice C will be constantly +1
 
 /* READ PARAMETERS */
 //fileinit = fopen("tdgl_init.dat", "r");
-fileinit = fopen("tdgl_result.dat", "r");
-/*First line is for parameters and seed*/
+FILE *fileinit;
 int seed;
+fileinit = fopen("tdgl_result.dat", "r");
+/*First line is for parameters and seed
+  tdgl adopts THE SAME parameters (N,dx, dt) that were used in the
+  previous evolution with tdglfd or tdgl
+  You CAN JUST CHANGE (C, Thalf) otherwise they are the same of the previous evolution
+  You MUST choose Deltat of the evolution
+*/
 fscanf(fileinit, "%d %lf %lf %lf %d %lf %lf\n", &N, &tmin, &dx, &dt, &seed, &Ampl, &Thalf);
 fclose(fileinit);
 
 /* Get inputs from the terminal */
 char *ptr;
-//printf("argv1 = %lf", atof(argv[1]));
 if (argc > 1)
+	/*Choose Deltat of the evolution*/
 	Deltat = strtod(argv[1], &ptr);
 if (argc > 2){
   	Ampl = strtod(argv[2], &ptr);
 }
 if (argc > 3){
   	Thalf = strtod(argv[3], &ptr);
-	//printf("\n%lf\n", Thalf);
 }
-tmax = tmin + Deltat;
-/*
-if (argc > 2){
-  	Ampl = strtod(argv[2], &ptr);
-}
-if (argc > 3){
-  	Thalf = strtod(argv[3], &ptr);
-}
+/*The evolutions are progressive, so the initial time (and state)
+ are the finals of the previous evolution
 */
+tmax = tmin + Deltat;
 
 double x[10000];
 double u[10000];
@@ -88,7 +86,7 @@ FILE *stateeqn_result;
 FILE *fileCout;				/*C(t) values*/
 FILE *fileAveout;			/*Space average of u(t) values*/
 //FILE *fileCin;
-FILE *fileq2mean;
+FILE *fileq2mean;			/*???*/
 
 double ttime=0;
 int nloop=(Deltat)/dt;
@@ -105,7 +103,15 @@ double uAve[nloop];
 //fclose(fileCin);
 
 /*Define value of C(t) in time.
-	It switches from +A to -A each T/2 time */
+	C(t) = Ampl*sin(pi*t/(T/2))
+	NOTE: Time "t" starts at the beginning of the FIRST of
+	the serie of consecutive evolutions, and NOT at the beginning
+	of the current simulation.
+	So the C value at the beginning of the current simulation
+	is NOT Ampl*sin(0) = 0 .
+	BUT defining C(t) like this, we have the property that C(t)
+	is varying SMOOTHLY during the WHOLE (total serie of consecutive evolutions) experiment.
+*/
 for (loop=0;loop<nloop;loop++){
 ttime = tmin + (loop+1)*dt;
 if(Thalf > 0){
@@ -118,7 +124,7 @@ if(Thalf > 0){
 		C[loop]=-Ampl;
 	*/
 	}
-	else
+	else	/*Thalf < 0 means you want to keep C costant*/
 		C[loop] = Ampl;
 }
 
@@ -268,14 +274,21 @@ fprintf(fileq2mean, "%.2f %.20f\n", ttime, decaoutq2mean);
 }
 fclose(fileq2mean);
 
+/*Save the values taken by C(t) in time.
+  They are appendend, so you save its values from t=0
+*/
 fileCout = fopen("fileCout.dat", "a");
 for (loop=0; loop<nloop; loop++){
 ttime = tmin + (loop+1)*dt;
 decaoutC = C[loop];
+/*printf("C[%d] = %lf\n", loop, C[loop]);*/
 fprintf(fileCout, "%.5f %.20f\n", ttime, decaoutC);
 }
 fclose(fileCout);
 
+/*Save the SPACE average of u(x,t) at each time.
+  They are appendend, so you save its values from t=0
+*/
 fileAveout = fopen("fileAveout.dat", "a");
 for (loop=0; loop<nloop; loop++){
 ttime = tmin + (loop+1)*dt;

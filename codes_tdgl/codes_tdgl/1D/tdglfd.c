@@ -19,9 +19,6 @@ double dt=0.001; // note: stable upto dt=0.001
 double tmin=0;
 double tmax=1;  // Suggest "1" because in the fft algorithm tmin = 1 is hardcoded 
 
-/* C(t)=Ampl*sign(sin(2pi/Thalf*t) 
-   so it switchd from +Ampl to -Ampl every Thalf time    
-*/
 double Ampl = 1;
 double Thalf = -1;  // with this choice C will be constantly +Ampl
 
@@ -35,7 +32,12 @@ if (argc > 2){
   Ampl = strtod(argv[2], &ptr);
 }
 if (argc > 3){
-  Thalf = strtod(argv[3], &ptr);
+  /*Period of the sine*/
+  Thalf = strtod(argv[3], &ptr)/2;
+}
+if (argc > 4){
+  /*Period of the sine*/
+  dt = strtod(argv[4], &ptr);
 }
   
 
@@ -72,6 +74,14 @@ double area;
 int nloop=(tmax-tmin)/dt;
 
 double C[nloop];
+
+/*Recreate fileCout of values of C(t) and fileAve of Space Averages [Progressive
+executions of the dynamics will APPEND info]*/
+FILE *file;
+file = fopen("fileCout.dat", "w");
+fclose(file);
+file = fopen("fileAveout.dat", "w");
+fclose(file);
 
 /*Define the values of C(t) at different times
   We set C(t) switching between +Ampl and -Ampl with the
