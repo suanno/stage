@@ -37,3 +37,6 @@ The _lenght_ of the _saturation tail_ seems to be infinite as shows this $tspan 
 Keeping $T/dt = 1000$ **fixed** you can see that the deviation of $C(nT)$ from the expected value (zero) is _the same_ independently on the couple ($T, dt$) you choose.
 You see that, because the _curves are overlapping_.
 ![see here](../codes_tdgl/codes_tdgl/1D/Plots/C(t)%20resolution%20is%20T%20over%20dt.png)
+
+We see that the error on the encoding of $C(t)$ increases with $n$ (and so with $t$) but even at $n=10^4$ (so $n\sim n_{max}$) the error is little ($\sim 10^{-12}$) as you can see 
+![here](../codes_tdgl/codes_tdgl/1D/Plots/error%20on%20C(nT)%20is%20low.png)
