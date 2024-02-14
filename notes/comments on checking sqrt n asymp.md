@@ -23,20 +23,19 @@ The asymptotic behavior is observable in the numerical solutions ![here](../code
 
 ### Post-asymptotic behavior
 Following the region where the asymptotic behavior holds, $u(nT)$ converges to a constant value that increases with $dt$.
-While $u(nT)$ stabilizes, the curve $u(t)$ evaluated at times different from $nT$ exhibits oscillations ![as shown here](../codes_tdgl/codes_tdgl/1D/Plots/long%20time%20oscillation%20when%20u(nT)%20is%20constant.png)
+While $u(nT)$ stabilizes, the curve $u(t)$ evaluated at times different from $nT$ exhibits oscillations ![as shown here](../codes_tdgl/codes_tdgl/1D/Plots/long%20time%20oscillation%20when%20u(nT)%20is%20constant.png?raw=true)
 
-Increasing the period $T$ with fixed $dt$ (and so increasing the accuracy with which the control function $C(t)$ is encoded numerically) lowers the $n_{max}$ when the _saturation behaviour_ begins. ![here](../codes_tdgl/codes_tdgl/1D/Plots/varying%20T%20fixed%20dt.png) (where $u_0=10$).
+Increasing the period $T$ with fixed $dt$ (and so increasing the accuracy with which the control function $C(t)$ is encoded numerically) lowers the $n_{max}$ when the _saturation behaviour_ begins. ![here](../codes_tdgl/codes_tdgl/1D/Plots/varying%20T%20fixed%20dt.png?raw=true) (where $u_0=10$).
 
 It's worth noting that increasing the period $T$ makes $u(t)$ go faster to zero, as $u(t)\sim\frac{1}{I_0{T}}\sim\frac{1}{T}$ is the asymptotic behaviour expected.
 So it's not strange that increasing $T$ anticipates the pre-asymptotic behaviour.
 
 The _lenght_ of the _saturation tail_ seems to be infinite as shows this $tspan = 10^4$ evolution ($u_0 = 10$)
-![here](../codes_tdgl/codes_tdgl/1D/Plots/long%20tail.png)
-
+![here](../codes_tdgl/codes_tdgl/1D/Plots/long%20tail.png?raw=true)
 ### Resolution of $C(t)$ encoding
 Keeping $T/dt = 1000$ **fixed** you can see that the deviation of $C(nT)$ from the expected value (zero) is _the same_ independently on the couple ($T, dt$) you choose.
 You see that, because the _curves are overlapping_.
-![see here](../codes_tdgl/codes_tdgl/1D/Plots/C(t)%20resolution%20is%20T%20over%20dt.png)
+![see here](../codes_tdgl/codes_tdgl/1D/Plots/C(t)%20resolution%20is%20T%20over%20dt.png?raw=true)
 
 We see that the error on the encoding of $C(t)$ increases with $n$ (and so with $t$) but even at $n=10^4$ (so $n\sim n_{max}$) the error is little ($\sim 10^{-12}$) as you can see 
-![here](../codes_tdgl/codes_tdgl/1D/Plots/error%20on%20C(nT)%20is%20low.png)
+![here](../codes_tdgl/codes_tdgl/1D/Plots/error%20on%20C(nT)%20is%20low.png?raw=true)
