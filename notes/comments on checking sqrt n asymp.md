@@ -15,7 +15,7 @@ The pre-asymptotic behavior can be eliminated **by increasing $T$ or $u_0$**. Ho
 Here we can see the pre-asymptotic behavior with $u_0 = 0.2$ ![here](../codes_tdgl/codes_tdgl/1D/Plots/at%20long%20times%20becames%20constant%202%20u0=0.2.png)
 
 ### Asymptotic behavior
-The asymptotic behavior is observable in the numerical solutions ![here](../codes_tdgl/codes_tdgl/1D/Plots/at%20long%20times%20becames%20constant%202%20u0=10%20with%20analytical.png), where we adopted a large $u_0=10$ in order to get rid of the pre-asymptotic behaviour
+The asymptotic behavior is observable in the numerical solutions ![here](../codes_tdgl/codes_tdgl/1D/Plots/at%20long%20times%20becames%20constant%202%20u0=10%20with%20analytical.png?raw=true), where we adopted a large $u_0=10$ in order to get rid of the pre-asymptotic behaviour
 
 **However:**
 - The asymptotic behavior persists **until** a certain $n_{max}$, which decreases with the time step.
