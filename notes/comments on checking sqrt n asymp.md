@@ -8,7 +8,7 @@ $$I_0(T)\simeq 2.28T\text{,\quad if }C(t) = A\sin(2\pi t/T)\text{, with } A=1$$
 
 As $n$ becomes large, the term with $n$ dominates the right-hand side, yielding the **asymptotic behavior**
 $$u(nT)\simeq \frac{1}{2I_0(T)}n^{-\frac12}$$
-Quantitatively, this behavior holds true when $2nI_0(T) >> \frac{1}{u_0^2}$, which occurs when $n>>\tilde{n}$ with $\tilde{n} = \frac{1}{2*2.28*T*u_0^2}$.
+Quantitatively, this behavior holds true when $2nI_0(T) >> \frac{1}{u_0^2}$, which occurs when $n>>\tilde{n}$ with $\tilde{n} = \frac{1}{2*2.28*T*u_0^2}$
 
 The pre-asymptotic behavior can be eliminated **by increasing $T$ or $u_0$**. However, significantly increasing $u_0$ could render the term $\frac{1}{u_0^2}$ negligible even at low times $t$, leading the analytical solution to suggest $u(nT)$ as the reciprocal of $2nI_0(T)$, which, for low $n$ (and thus $t$), approaches zero. Consequently, computational overflow errors are expected due to division by numbers close to zero.
 
