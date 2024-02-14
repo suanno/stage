@@ -12,8 +12,7 @@ Quantitatively, this behavior holds true when $2nI_0(T) >> \frac{1}{u_0^2}$, whi
 
 The pre-asymptotic behavior can be eliminated **by increasing $T$ or $u_0$**. However, significantly increasing $u_0$ could render the term $\frac{1}{u_0^2}$ negligible even at low times $t$, leading the analytical solution to suggest $u(nT)$ as the reciprocal of $2nI_0(T)$, which, for low $n$ (and thus $t$), approaches zero. Consequently, computational overflow errors are expected due to division by numbers close to zero.
 
-Here we can see the pre-asymptotic behavior with $u_0 = 0.2$ ![here](../codes_tdgl/codes_tdgl/1D/Plots/at%20long%20times%20becames%20constant%202%20u0=0.2.png)
-
+Here we can see the pre-asymptotic behavior with $u_0 = 0.2$ ![here](../codes_tdgl/codes_tdgl/1D/Plots/at%20long%20times%20becames%20constant%202%20u0=0.2.png?raw=true)
 ### Asymptotic behavior
 The asymptotic behavior is observable in the numerical solutions ![here](../codes_tdgl/codes_tdgl/1D/Plots/at%20long%20times%20becames%20constant%202%20u0=10%20with%20analytical.png?raw=true), where we adopted a large $u_0=10$ in order to get rid of the pre-asymptotic behaviour
 
